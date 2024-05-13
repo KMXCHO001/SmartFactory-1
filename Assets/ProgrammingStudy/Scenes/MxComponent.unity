@@ -1180,7 +1180,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &583122499
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1731,8 +1731,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 819925992}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: -0.20694377, y: -0.22343734, z: 0.048608977, w: -0.9512556}
+  m_LocalPosition: {x: -3.6562748, y: 5.96539, z: -9.649844}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2132,6 +2132,7 @@ MonoBehaviour:
   Y1: 0
   Y2: 0
   Y3: 0
+  isCylinderMoving: 0
 --- !u!1 &1003448641
 GameObject:
   m_ObjectHideFlags: 0
@@ -3030,7 +3031,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1243029790
 RectTransform:
   m_ObjectHideFlags: 0

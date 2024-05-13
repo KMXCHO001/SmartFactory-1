@@ -41,6 +41,7 @@ public class MxComponent : MonoBehaviour
     public int Y1 = 0;
     public int Y2 = 0;
     public int Y3 = 0;
+    public bool isCylinderMoving = false;
 
     void Start()
     {
@@ -54,12 +55,13 @@ public class MxComponent : MonoBehaviour
         yellowLamp.material.color = Color.black;
         greenLamp.material.color = Color.black;
 
-        StartCoroutine(CoListener());
-        StartCoroutine(CoRunMPS());
+        // StartCoroutine(CoListener());
+        // StartCoroutine(CoRunMPS());
     }
 
     private void Update()
     {
+        /* // 신호등 예시
         int valueRed = GetDevice("M100");
         if (valueRed != 0)
         {
@@ -82,6 +84,72 @@ public class MxComponent : MonoBehaviour
             redLamp.material.color = Color.black;
             yellowLamp.material.color = Color.black;
             greenLamp.material.color = Color.green;
+        }*/
+
+        /* // 실습1
+        int motor0 = GetDevice("M0");
+        int timer0 = GetDevice("T0");
+        int motor1 = GetDevice("M1");
+        int timer1 = GetDevice("T1");
+
+        log.text = $"Motor0: {motor0}, Timer0: {timer0}\n" +
+                   $"Motor1: {motor1}, Timer1: {timer1}";
+        */
+
+        /*// 실습2
+        int redLampValue = GetDevice("M1");
+        int yellowLampValue = GetDevice("M2");
+        int greenLampValue = GetDevice("M3");
+
+        if(redLampValue == 1)
+        {
+            redLamp.material.color = Color.red;
+        }
+        else
+        {
+            redLamp.material.color = Color.black;
+        }
+
+        if (yellowLampValue == 1)
+        {
+            yellowLamp.material.color = Color.yellow;
+        }
+        else
+        {
+            yellowLamp.material.color = Color.black;
+        }
+
+        if(greenLampValue == 1)
+        {
+            greenLamp.material.color = Color.green;
+        }
+        else
+        {
+            greenLamp.material.color = Color.black;
+        }*/
+
+        // 실습3
+        int redLampValue = GetDevice("Y0");
+        int cylinderFW = GetDevice("Y1");
+        int cylinderBW = GetDevice("Y2");
+
+        if(redLampValue == 1)
+        {
+            redLamp.material.color = Color.red;
+        }
+        else
+        {
+            redLamp.material.color = Color.black;
+        }
+
+        if(cylinderFW == 1 && !isCylinderMoving)
+        {
+            StartCoroutine(MoveCylinder(cylinderA, cylinderA_start.position, cylinderA_end.position, 5));
+        }
+
+        if(cylinderBW == 1 && !isCylinderMoving)
+        {
+            StartCoroutine(MoveCylinder(cylinderA, cylinderA_end.position, cylinderA_start.position, 5));
         }
     }
 
@@ -89,13 +157,13 @@ public class MxComponent : MonoBehaviour
     {
         if (connection == Connection.Connected)
         {
-            int lampData = 0;
-            int returnValue = mxComponent.GetDevice(device, out lampData);
+            int data = 0;
+            int returnValue = mxComponent.GetDevice(device, out data);
 
             if (returnValue != 0)
                 print(returnValue.ToString("X"));
 
-            return lampData;
+            return data;
         }
         else
             return 0;
@@ -221,6 +289,7 @@ public class MxComponent : MonoBehaviour
     // Vector3.Lerp 사용
     IEnumerator MoveCylinder(Transform cylinder, Vector3 positionA, Vector3 positionB, float duration)
     {
+        isCylinderMoving = true;
         float currentTime = 0;
 
         while (true)
@@ -237,6 +306,8 @@ public class MxComponent : MonoBehaviour
 
             yield return new WaitForSeconds(Time.deltaTime);
         }
+
+        isCylinderMoving = false;
     }
 
     IEnumerator CoListener()
