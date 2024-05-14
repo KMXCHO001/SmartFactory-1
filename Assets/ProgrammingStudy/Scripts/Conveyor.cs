@@ -1,3 +1,4 @@
+using MPS;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -10,7 +11,15 @@ public class Conveyor : MonoBehaviour
     public GameObject pushObj;
     public AudioClip clip;
     Vector3 pushObjOriginPos;
+    public int plcInputValue;
+    bool isConveyorMoving = false;
 
+    private void Update()
+    {
+        if (MPSMxComponent.instance.connection == MPSMxComponent.Connection.Connected)
+            if (plcInputValue > 0 && !isConveyorMoving)
+                TurnOnConveyor();
+    }
 
     public void TurnOnConveyor()
     {
@@ -25,6 +34,8 @@ public class Conveyor : MonoBehaviour
 
     IEnumerator CoMovePushObject()
     {
+        isConveyorMoving = true;
+
         while (true)
         {
             currentTime += Time.deltaTime;
@@ -41,5 +52,7 @@ public class Conveyor : MonoBehaviour
 
             yield return new WaitForSeconds(Time.deltaTime);
         }
+
+        isConveyorMoving = false;
     }
 }

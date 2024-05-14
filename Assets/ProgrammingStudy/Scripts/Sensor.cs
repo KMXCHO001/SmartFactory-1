@@ -8,6 +8,7 @@ public class Sensor : MonoBehaviour
     public bool isMetalObject = false;
     public MeshRenderer led;
     public AudioClip clip;
+    public int plcInputValue;
 
     private void OnTriggerEnter(Collider other)
     {

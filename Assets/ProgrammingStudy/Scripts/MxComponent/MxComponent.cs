@@ -30,6 +30,8 @@ public class MxComponent : MonoBehaviour
     public MeshRenderer redLamp;
     public MeshRenderer yellowLamp;
     public MeshRenderer greenLamp;
+    public MeshRenderer redLamp_Person;
+    public MeshRenderer greenLamp_Person;
 
     public Transform cylinderA;
     public Transform cylinderA_start;
@@ -54,6 +56,8 @@ public class MxComponent : MonoBehaviour
         redLamp.material.color = Color.black;
         yellowLamp.material.color = Color.black;
         greenLamp.material.color = Color.black;
+        redLamp_Person.material.color = Color.black;
+        greenLamp_Person.material.color = Color.black;
 
         // StartCoroutine(CoListener());
         // StartCoroutine(CoRunMPS());
@@ -96,44 +100,44 @@ public class MxComponent : MonoBehaviour
                    $"Motor1: {motor1}, Timer1: {timer1}";
         */
 
-        /*// 실습2
-        int redLampValue = GetDevice("M1");
-        int yellowLampValue = GetDevice("M2");
-        int greenLampValue = GetDevice("M3");
+        /*        // 실습2
+                int redLampValue = GetDevice("M1");
+                int yellowLampValue = GetDevice("M2");
+                int greenLampValue = GetDevice("M3");
 
-        if(redLampValue == 1)
-        {
-            redLamp.material.color = Color.red;
-        }
-        else
-        {
-            redLamp.material.color = Color.black;
-        }
+                if (redLampValue == 1)
+                {
+                    redLamp.material.color = Color.red;
+                }
+                else
+                {
+                    redLamp.material.color = Color.black;
+                }
 
-        if (yellowLampValue == 1)
-        {
-            yellowLamp.material.color = Color.yellow;
-        }
-        else
-        {
-            yellowLamp.material.color = Color.black;
-        }
+                if (yellowLampValue == 1)
+                {
+                    yellowLamp.material.color = Color.yellow;
+                }
+                else
+                {
+                    yellowLamp.material.color = Color.black;
+                }
 
-        if(greenLampValue == 1)
-        {
-            greenLamp.material.color = Color.green;
-        }
-        else
-        {
-            greenLamp.material.color = Color.black;
-        }*/
+                if (greenLampValue == 1)
+                {
+                    greenLamp.material.color = Color.green;
+                }
+                else
+                {
+                    greenLamp.material.color = Color.black;
+                }*/
 
-        // 실습3
+        /*        // 실습3
         int redLampValue = GetDevice("Y0");
         int cylinderFW = GetDevice("Y1");
         int cylinderBW = GetDevice("Y2");
 
-        if(redLampValue == 1)
+        if (redLampValue == 1)
         {
             redLamp.material.color = Color.red;
         }
@@ -142,14 +146,49 @@ public class MxComponent : MonoBehaviour
             redLamp.material.color = Color.black;
         }
 
-        if(cylinderFW == 1 && !isCylinderMoving)
+        if (cylinderFW == 1 && !isCylinderMoving)
         {
             StartCoroutine(MoveCylinder(cylinderA, cylinderA_start.position, cylinderA_end.position, 5));
         }
 
-        if(cylinderBW == 1 && !isCylinderMoving)
+        if (cylinderBW == 1 && !isCylinderMoving)
         {
             StartCoroutine(MoveCylinder(cylinderA, cylinderA_end.position, cylinderA_start.position, 5));
+        }
+*/
+
+        // 실습4 차량, 보행자 신호등
+        int green_vehicle = GetDevice("Y0");
+        int yellow_vehicle = GetDevice("Y1");
+        int red_vehicle = GetDevice("Y2");
+        int green_people = GetDevice("Y10");
+        int red_people = GetDevice("Y11");
+
+        if(green_vehicle == 1)
+        {
+            greenLamp.material.color = Color.green;
+            yellowLamp.material.color = Color.black;
+            redLamp.material.color = Color.black;
+
+            greenLamp_Person.material.color = Color.black;
+            redLamp_Person.material.color = Color.red; 
+        }
+
+        if(yellow_vehicle == 1)
+        {
+            yellowLamp.material.color = Color.yellow;
+            greenLamp.material.color = Color.black;
+            redLamp.material.color = Color.black;
+        }
+
+        if(red_vehicle == 1)
+        {
+            redLamp.material.color = Color.red;
+            greenLamp.material.color = Color.black;
+            yellowLamp.material.color = Color.black;
+
+            greenLamp_Person.material.color = Color.green;
+            redLamp_Person.material.color= Color.black;
         }
     }
 
