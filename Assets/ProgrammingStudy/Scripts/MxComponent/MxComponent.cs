@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ActUtlType64Lib; // MX Component v5 Library »ç¿ë
+using ActUtlType64Lib; // MX Component v5 Library ì‚¬ìš©
 using TMPro;
 using UnityEngine.UI;
+using System.Diagnostics;
 
 
 /// <summary>
@@ -44,6 +45,7 @@ public class MxComponent : MonoBehaviour
     public int Y2 = 0;
     public int Y3 = 0;
     public bool isCylinderMoving = false;
+    Stopwatch sw;
 
     void Start()
     {
@@ -51,7 +53,8 @@ public class MxComponent : MonoBehaviour
         mxComponent.ActLogicalStationNumber = 1;
 
         //readButton.onClick.AddListener(OnReadDataBtnClkEvent);
-        readButton.onClick.AddListener(()=> OnReadDataBtnClkEvent(deviceInput, valueInput));
+        //readButton.onClick.AddListener(()=> OnReadDataBtnClkEvent(deviceInput, valueInput));
+        readButton.onClick.AddListener(()=> OnReadDataBlockBtnClkEvent(deviceInput, valueInput));
 
         redLamp.material.color = Color.black;
         yellowLamp.material.color = Color.black;
@@ -61,11 +64,13 @@ public class MxComponent : MonoBehaviour
 
         // StartCoroutine(CoListener());
         // StartCoroutine(CoRunMPS());
+
+        sw = new Stopwatch();
     }
 
     private void Update()
     {
-        /* // ½ÅÈ£µî ¿¹½Ã
+        /* // ì‹ í˜¸ë“± ì˜ˆì‹œ
         int valueRed = GetDevice("M100");
         if (valueRed != 0)
         {
@@ -90,7 +95,7 @@ public class MxComponent : MonoBehaviour
             greenLamp.material.color = Color.green;
         }*/
 
-        /* // ½Ç½À1
+        /* // ì‹¤ìŠµ1
         int motor0 = GetDevice("M0");
         int timer0 = GetDevice("T0");
         int motor1 = GetDevice("M1");
@@ -100,7 +105,7 @@ public class MxComponent : MonoBehaviour
                    $"Motor1: {motor1}, Timer1: {timer1}";
         */
 
-        /*        // ½Ç½À2
+        /*        // ì‹¤ìŠµ2
                 int redLampValue = GetDevice("M1");
                 int yellowLampValue = GetDevice("M2");
                 int greenLampValue = GetDevice("M3");
@@ -132,7 +137,7 @@ public class MxComponent : MonoBehaviour
                     greenLamp.material.color = Color.black;
                 }*/
 
-        /*        // ½Ç½À3
+        /*        // ì‹¤ìŠµ3
         int redLampValue = GetDevice("Y0");
         int cylinderFW = GetDevice("Y1");
         int cylinderBW = GetDevice("Y2");
@@ -157,7 +162,7 @@ public class MxComponent : MonoBehaviour
         }
 */
 
-        // ½Ç½À4 Â÷·®, º¸ÇàÀÚ ½ÅÈ£µî
+        // ì‹¤ìŠµ4 ì°¨ëŸ‰, ë³´í–‰ì ì‹ í˜¸ë“±
         int green_vehicle = GetDevice("Y0");
         int yellow_vehicle = GetDevice("Y1");
         int red_vehicle = GetDevice("Y2");
@@ -215,18 +220,18 @@ public class MxComponent : MonoBehaviour
             int returnValue = mxComponent.Open();
             if(returnValue == 0)
             {
-                print("¿¬°á¿¡ ¼º°øÇÏ¿´½À´Ï´Ù.");
+                print("ì—°ê²°ì— ì„±ê³µí•˜ì˜€ìŠµë‹ˆë‹¤.");
 
                 connection = Connection.Connected;
             }
             else
             {
-                print("¿¬°á¿¡ ½ÇÆĞÇß½À´Ï´Ù. returnValue: 0x" + returnValue.ToString("X")); // 16Áø¼ö·Î º¯°æ
+                print("ì—°ê²°ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤. returnValue: 0x" + returnValue.ToString("X")); // 16ì§„ìˆ˜ë¡œ ë³€ê²½
             }
         }
         else
         {
-            print("¿¬°á »óÅÂÀÔ´Ï´Ù.");
+            print("ì—°ê²° ìƒíƒœì…ë‹ˆë‹¤.");
         }
     }
 
@@ -237,17 +242,17 @@ public class MxComponent : MonoBehaviour
             int returnValue = mxComponent.Close();
             if (returnValue == 0)
             {
-                print("¿¬°á ÇØÁöµÇ¾ú½À´Ï´Ù.");
+                print("ì—°ê²° í•´ì§€ë˜ì—ˆìŠµë‹ˆë‹¤.");
                 connection = Connection.Disconnected;
             }
             else
             {
-                print("¿¬°á ÇØÁö¿¡ ½ÇÆĞÇß½À´Ï´Ù. returnValue: 0x" + returnValue.ToString("X")); // 16Áø¼ö·Î º¯°æ
+                print("ì—°ê²° í•´ì§€ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤. returnValue: 0x" + returnValue.ToString("X")); // 16ì§„ìˆ˜ë¡œ ë³€ê²½
             }
         }
         else
         {
-            print("¿¬°á ÇØÁö »óÅÂÀÔ´Ï´Ù.");
+            print("ì—°ê²° í•´ì§€ ìƒíƒœì…ë‹ˆë‹¤.");
         }
     }
 
@@ -313,19 +318,32 @@ public class MxComponent : MonoBehaviour
 
         if(connection == Connection.Connected)
         {
-            short data;
+            int data;
+            int size = 10;
+            int[] values = new int[size];
 
-            int returnValue = mxComponent.ReadDeviceRandom2(deviceInput.text, 1, out data);
+            sw.Restart();
+
+            int returnValue = mxComponent.ReadDeviceBlock(deviceInput.text, size, out values[0]);
+
+            sw.Stop();
+            print(sw.ElapsedMilliseconds);
+
             if (returnValue != 0)
                 print("returnValue: 0x" + returnValue.ToString("X"));
             else
-                deviceValue.text = $"{deviceInput.text}: {data}";
+                deviceValue.text = $"{deviceInput.text}: {values[0]}";
+
+            foreach(int value in values)
+            {
+                log.text += value.ToString("X") + "\n";
+            }
         }
     }
 
-    // ½Ç½À2. °ø±Ş ½Ç¸°´õ(A) ÀüÁø, ÈÄÁø ÈÄ, ¼ÛÃâ ½Ç¸°´õ(B) ÀüÁø, ÈÄÁø
-    // Á¶°Ç: ¸ğµç ½ÃÄö½º ÀÛµ¿½Ã°£Àº 1ÃÊ
-    // Vector3.Lerp »ç¿ë
+    // ì‹¤ìŠµ2. ê³µê¸‰ ì‹¤ë¦°ë”(A) ì „ì§„, í›„ì§„ í›„, ì†¡ì¶œ ì‹¤ë¦°ë”(B) ì „ì§„, í›„ì§„
+    // ì¡°ê±´: ëª¨ë“  ì‹œí€€ìŠ¤ ì‘ë™ì‹œê°„ì€ 1ì´ˆ
+    // Vector3.Lerp ì‚¬ìš©
     IEnumerator MoveCylinder(Transform cylinder, Vector3 positionA, Vector3 positionB, float duration)
     {
         isCylinderMoving = true;

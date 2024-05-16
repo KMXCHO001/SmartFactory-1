@@ -5,6 +5,7 @@ using ActUtlType64Lib; // MX Component v5 Library 사용
 using TMPro;
 using UnityEngine.UI;
 using System;
+using System.Linq;
 
 
 namespace MPS
@@ -64,22 +65,52 @@ namespace MPS
 
         private void GetTotalDeviceData()
         {
-            if(connection == Connection.Connected)
+            if (connection == Connection.Connected)
             {
-                //supplySensor.plcInputValue          = GetDevice("Y4");
-                supplyCylinder.plcInputValues[0]    = GetDevice("Y10");
-                supplyCylinder.plcInputValues[1]    = GetDevice("Y11");
-                machiningCylinder.plcInputValues[0] = GetDevice("Y20");
-                //deliveryCylinder.plcInputValues[0]  = GetDevice("Y30");
-                //deliveryCylinder.plcInputValues[1]  = GetDevice("Y31");
-                //conveyor.plcInputValue              = GetDevice("Y0");
-                //metalDetector.plcInputValue         = GetDevice("Y6");
-                //dischargeCylinder.plcInputValues[0] = GetDevice("Y40");
-                //dischargeCylinder.plcInputValues[1] = GetDevice("Y41");
-                //SetLampActive(redLamp, GetDevice("Y1"));
-                //SetLampActive(yellowLamp, GetDevice("Y2"));
-                //SetLampActive(greenLamp, GetDevice("Y3"));
+                short[] yData = ReadDeviceBlock("Y0", 5); // Short지만, 10개의 비트를 가져옴
+                string newYData = ConvertDateIntoString(yData);
+                
+                supplySensor.plcInputValue              = newYData[4 ] - '0';  // Y4
+                supplyCylinder.plcInputValues[0]        = newYData[10] - 48;  // Y10
+                supplyCylinder.plcInputValues[1]        = newYData[11] - 48;
+                machiningCylinder.plcInputValues[0]     = newYData[20] - 48;
+                deliveryCylinder.plcInputValues[0]      = newYData[30] - 48;
+                deliveryCylinder.plcInputValues[1]      = newYData[31] - 48;
+                conveyor.plcInputValue                  = newYData[0 ] - 48;
+                metalDetector.plcInputValue             = newYData[6 ] - 48;
+                dischargeCylinder.plcInputValues[0]     = newYData[40] - 48;
+                dischargeCylinder.plcInputValues[1]     = newYData[41] - 48;  // 50ms * 10 = 0.5s
+                SetLampActive(redLamp,    newYData[1] - 48);
+                SetLampActive(yellowLamp, newYData[2] - 48);
+                SetLampActive(greenLamp,  newYData[3] - 48);
             }
+        }
+
+        string ConvertDateIntoString(short[] data)
+        {
+            string newYData = "";
+            print(data.Length + "yData length");
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (data[i] == 0)
+                {
+                    newYData += "0000000000";
+                    continue;
+                }
+
+                string temp = Convert.ToString(data[i], 2);// 100
+                string temp2 = new string(temp.Reverse().ToArray()); // reverse 100 -> 001  
+                newYData += temp2; // 0000000000 + 001
+
+                if (temp2.Length < 10)
+                {
+                    int zeroCount = 10 - temp2.Length; // 7 -> 7개의 0을 newYData에 더해준다. (0000000)
+                    for (int j = 0; j < zeroCount; j++)
+                        newYData += "0";
+                } // 0000000000 + 001 + 0000000 -> 총 20개의 비트
+            }
+
+            return newYData;
         }
 
         void SetLampActive(MeshRenderer renderer, int value)
@@ -121,6 +152,22 @@ namespace MPS
             }
             else
                 return 0;
+        }
+
+        short[] ReadDeviceBlock(string startDeviceName, int _blockSize)
+        {
+            if (connection == Connection.Connected)
+            {
+                short[] devices = new short[_blockSize];
+                int returnValue = mxComponent.ReadDeviceBlock2(startDeviceName, _blockSize, out devices[0]);
+
+                if (returnValue != 0)
+                    print(returnValue.ToString("X"));
+
+                return devices;
+            }
+            else
+                return null;
         }
 
         public bool SetDevice(string device, int value)
