@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using ActUtlType64Lib; // MX Component v5 Library »ç¿ë
+using ActUtlType64Lib; // MX Component v5 Library ì‚¬ìš©
 using TMPro;
 using UnityEngine.UI;
 using System;
@@ -23,17 +23,17 @@ namespace MPS
 
         ActUtlType64 mxComponent;
         public Connection connection = Connection.Disconnected;
-        public List<Button> offButtons = new List<Button>(); // MXÄÄÆ÷³ÍÆ®¿¡ ¿¬°áÀÌ µÉ ¶§ non-interactable ÇÏ°Ô ¸¸µå´Â ¹öÆ°µé
+        public List<Button> offButtons = new List<Button>(); // MXì»´í¬ë„ŒíŠ¸ì— ì—°ê²°ì´ ë  ë•Œ non-interactable í•˜ê²Œ ë§Œë“œëŠ” ë²„íŠ¼ë“¤
 
-        public Sensor supplySensor;      // 1. °ø±Ş °¨Áö ¼¾¼­
-        public Piston supplyCylinder;    // 2. °ø±Ş ½Ç¸°´õ
-        public Piston machiningCylinder; // 3. °¡°ø ½Ç¸°´õ
-        public Piston deliveryCylinder;  // 4. ¼ÛÃâ ½Ç¸°´õ
-        public Sensor objectDetector;    // 6. ¹°Ã¼ °¨Áö ¼¾¼­
-        public Conveyor conveyor;        // 7. ÄÁº£ÀÌ¾î
-        public Sensor metalDetector;     // 8. ±İ¼Ó °¨Áö ¼¾¼­
-        public Piston dischargeCylinder; // 9. ¹èÃâ ½Ç¸°´õ
-        public MeshRenderer redLamp;     // 10. ·¥ÇÁ
+        public Sensor supplySensor;      // 1. ê³µê¸‰ ê°ì§€ ì„¼ì„œ
+        public Piston supplyCylinder;    // 2. ê³µê¸‰ ì‹¤ë¦°ë”
+        public Piston machiningCylinder; // 3. ê°€ê³µ ì‹¤ë¦°ë”
+        public Piston deliveryCylinder;  // 4. ì†¡ì¶œ ì‹¤ë¦°ë”
+        public Sensor objectDetector;    // 5. ë¬¼ì²´ ê°ì§€ ì„¼ì„œ
+        public Conveyor conveyor;        // 6. ì»¨ë² ì´ì–´
+        public Sensor metalDetector;     // 7. ê¸ˆì† ê°ì§€ ì„¼ì„œ
+        public Piston dischargeCylinder; // 8. ë°°ì¶œ ì‹¤ë¦°ë”
+        public MeshRenderer redLamp;     // 9. ë¨í”„
         public MeshRenderer yellowLamp;
         public MeshRenderer greenLamp;
 
@@ -64,19 +64,22 @@ namespace MPS
 
         private void GetTotalDeviceData()
         {
-            supplySensor.plcInputValue          = GetDevice("");
-            supplyCylinder.plcInputValues[0]    = GetDevice("");
-            supplyCylinder.plcInputValues[1]    = GetDevice("");
-            machiningCylinder.plcInputValues[0] = GetDevice("");
-            deliveryCylinder.plcInputValues[0]  = GetDevice("");
-            deliveryCylinder.plcInputValues[1]  = GetDevice("");
-            conveyor.plcInputValue              = GetDevice("");
-            metalDetector.plcInputValue         = GetDevice("");
-            dischargeCylinder.plcInputValues[0] = GetDevice("");
-            dischargeCylinder.plcInputValues[1] = GetDevice("");
-            SetLampActive(redLamp, GetDevice(""));
-            SetLampActive(yellowLamp, GetDevice(""));
-            SetLampActive(greenLamp, GetDevice(""));
+            if(connection == Connection.Connected)
+            {
+                //supplySensor.plcInputValue          = GetDevice("Y4");
+                supplyCylinder.plcInputValues[0]    = GetDevice("Y10");
+                supplyCylinder.plcInputValues[1]    = GetDevice("Y11");
+                machiningCylinder.plcInputValues[0] = GetDevice("Y20");
+                //deliveryCylinder.plcInputValues[0]  = GetDevice("Y30");
+                //deliveryCylinder.plcInputValues[1]  = GetDevice("Y31");
+                //conveyor.plcInputValue              = GetDevice("Y0");
+                //metalDetector.plcInputValue         = GetDevice("Y6");
+                //dischargeCylinder.plcInputValues[0] = GetDevice("Y40");
+                //dischargeCylinder.plcInputValues[1] = GetDevice("Y41");
+                //SetLampActive(redLamp, GetDevice("Y1"));
+                //SetLampActive(yellowLamp, GetDevice("Y2"));
+                //SetLampActive(greenLamp, GetDevice("Y3"));
+            }
         }
 
         void SetLampActive(MeshRenderer renderer, int value)
@@ -120,6 +123,21 @@ namespace MPS
                 return 0;
         }
 
+        public bool SetDevice(string device, int value)
+        {
+            if (connection == Connection.Connected)
+            {
+                int returnValue = mxComponent.SetDevice(device, value);
+
+                if (returnValue != 0)
+                    print(returnValue.ToString("X"));
+
+                return true;
+            }
+            else
+                return false;
+        }
+
         public void OnConnectPLCBtnClkEvent()
         {
             if (connection == Connection.Disconnected)
@@ -127,21 +145,31 @@ namespace MPS
                 int returnValue = mxComponent.Open();
                 if (returnValue == 0)
                 {
-                    print("¿¬°á¿¡ ¼º°øÇÏ¿´½À´Ï´Ù.");
+                    print("ì—°ê²°ì— ì„±ê³µí•˜ì˜€ìŠµë‹ˆë‹¤.");
 
                     SetOffButtonsActive(false);
+
+                    StartCoroutine(CoSendDevice());
 
                     connection = Connection.Connected;
                 }
                 else
                 {
-                    print("¿¬°á¿¡ ½ÇÆĞÇß½À´Ï´Ù. returnValue: 0x" + returnValue.ToString("X")); // 16Áø¼ö·Î º¯°æ
+                    print("ì—°ê²°ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤. returnValue: 0x" + returnValue.ToString("X")); // 16ì§„ìˆ˜ë¡œ ë³€ê²½
                 }
             }
             else
             {
-                print("¿¬°á »óÅÂÀÔ´Ï´Ù.");
+                print("ì—°ê²° ìƒíƒœì…ë‹ˆë‹¤.");
             }
+        }
+
+        IEnumerator CoSendDevice()
+        {
+            yield return new WaitForSeconds(0.5f);
+
+            supplyCylinder.SetSwitchDevicesByCylinderMoving(false, true);
+            machiningCylinder.SetSwitchDevicesByCylinderMoving(false, true);
         }
 
         private void SetOffButtonsActive(bool isActive)
@@ -159,7 +187,7 @@ namespace MPS
                 int returnValue = mxComponent.Close();
                 if (returnValue == 0)
                 {
-                    print("¿¬°á ÇØÁöµÇ¾ú½À´Ï´Ù.");
+                    print("ì—°ê²° í•´ì§€ë˜ì—ˆìŠµë‹ˆë‹¤.");
 
                     SetOffButtonsActive(true);
 
@@ -167,18 +195,18 @@ namespace MPS
                 }
                 else
                 {
-                    print("¿¬°á ÇØÁö¿¡ ½ÇÆĞÇß½À´Ï´Ù. returnValue: 0x" + returnValue.ToString("X")); // 16Áø¼ö·Î º¯°æ
+                    print("ì—°ê²° í•´ì§€ì— ì‹¤íŒ¨í–ˆìŠµë‹ˆë‹¤. returnValue: 0x" + returnValue.ToString("X")); // 16ì§„ìˆ˜ë¡œ ë³€ê²½
                 }
             }
             else
             {
-                print("¿¬°á ÇØÁö »óÅÂÀÔ´Ï´Ù.");
+                print("ì—°ê²° í•´ì§€ ìƒíƒœì…ë‹ˆë‹¤.");
             }
         }
 
-        // ½Ç½À2. °ø±Ş ½Ç¸°´õ(A) ÀüÁø, ÈÄÁø ÈÄ, ¼ÛÃâ ½Ç¸°´õ(B) ÀüÁø, ÈÄÁø
-        // Á¶°Ç: ¸ğµç ½ÃÄö½º ÀÛµ¿½Ã°£Àº 1ÃÊ
-        // Vector3.Lerp »ç¿ë
+        // ì‹¤ìŠµ2. ê³µê¸‰ ì‹¤ë¦°ë”(A) ì „ì§„, í›„ì§„ í›„, ì†¡ì¶œ ì‹¤ë¦°ë”(B) ì „ì§„, í›„ì§„
+        // ì¡°ê±´: ëª¨ë“  ì‹œí€€ìŠ¤ ì‘ë™ì‹œê°„ì€ 1ì´ˆ
+        // Vector3.Lerp ì‚¬ìš©
         IEnumerator MoveCylinder(Transform cylinder, Vector3 positionA, Vector3 positionB, float duration)
         {
             isCylinderMoving = true;
