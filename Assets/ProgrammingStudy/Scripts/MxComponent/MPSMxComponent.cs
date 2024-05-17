@@ -69,7 +69,9 @@ namespace MPS
             {
                 short[] yData = ReadDeviceBlock("Y0", 5); // Short지만, 10개의 비트를 가져옴
                 string newYData = ConvertDateIntoString(yData);
-                
+
+                // print(newYData); // 데이터를 잘 받아오는지 확인
+
                 supplySensor.plcInputValue              = newYData[4 ] - '0';  // Y4
                 supplyCylinder.plcInputValues[0]        = newYData[10] - 48;  // Y10
                 supplyCylinder.plcInputValues[1]        = newYData[11] - 48;
@@ -89,7 +91,6 @@ namespace MPS
         string ConvertDateIntoString(short[] data)
         {
             string newYData = "";
-            print(data.Length + "yData length");
             for (int i = 0; i < data.Length; i++)
             {
                 if (data[i] == 0)
@@ -211,12 +212,23 @@ namespace MPS
             }
         }
 
+        public void OnStartPLCButtonClkEvent()
+        {
+            if (connection == Connection.Connected)
+            {
+                SetDevice("X0", 1);
+                SetDevice("X0", 0);
+            }
+        }
+
         IEnumerator CoSendDevice()
         {
             yield return new WaitForSeconds(0.5f);
 
             supplyCylinder.SetSwitchDevicesByCylinderMoving(false, true);
             machiningCylinder.SetSwitchDevicesByCylinderMoving(false, true);
+            deliveryCylinder.SetSwitchDevicesByCylinderMoving(false, true);
+            dischargeCylinder.SetSwitchDevicesByCylinderMoving(false, true);
         }
 
         private void SetOffButtonsActive(bool isActive)

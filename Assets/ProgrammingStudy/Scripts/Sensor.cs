@@ -1,10 +1,11 @@
+using MPS;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Sensor : MonoBehaviour
 {
-    public bool isObjectDetected = false; // flag º¯¼ö, bool º¯¼ö
+    public bool isObjectDetected = false; // flag ë³€ìˆ˜, bool ë³€ìˆ˜
     public bool isMetalObject = false;
     public MeshRenderer led;
     public AudioClip clip;
@@ -14,6 +15,9 @@ public class Sensor : MonoBehaviour
     {
         AudioManager.instance.PlayAudioClip(clip);
         AudioManager.instance.SetPlayTime(4f);
+
+        print("MetalObject ê°ì§€");
+        MPSMxComponent.instance.SetDevice("Y5", 1);
 
         if (other.gameObject.layer == LayerMask.NameToLayer("Object"))
         {
@@ -36,12 +40,11 @@ public class Sensor : MonoBehaviour
         if (other.gameObject.layer == LayerMask.NameToLayer("MetalObject"))
         {
             isMetalObject = true;
-            print("MetalObject °¨Áö");
         }
         /*  else
         {
             isMetalObject = false;
-            print("NonMetalObject °¨Áö");
+            print("NonMetalObject ê°ì§€");
         }*/
 
         led.material.color = Color.green;
@@ -52,5 +55,6 @@ public class Sensor : MonoBehaviour
     {
         led.material.color = Color.white;
         isObjectDetected = false;
+        MPSMxComponent.instance.SetDevice("Y5", 0);
     }
 }

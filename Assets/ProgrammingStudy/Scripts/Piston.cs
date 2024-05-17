@@ -1,4 +1,4 @@
-﻿using MPS;
+using MPS;
 using System.Collections;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
@@ -11,7 +11,24 @@ public class Piston : MonoBehaviour
         SingleSolenoid = 1,
         DoubleSolenoid = 2
     }
+
+    // 상태
+    [Header("현재 상태")]
+    [Tooltip("솔레노이드를 편솔 또는 양솔로 설정합니다.")]
     public Option option = Option.SingleSolenoid;
+    [Tooltip("GX Works의 Global Device Comment에 설정한 디바이스 값을 입력해 주세요.")]
+    public string rearSwitchDeviceName;
+    public string frontSwitchDeviceName;
+    public int[] plcInputValues; // 편솔의 경우 입력 1개, 양솔의 경우 입력 2개
+    public bool isBackward = true;
+    public bool isCylinderMoving = false;
+    [Tooltip("실린더가 이동을 마치는 데 걸리는 시간입니다.")]
+    public float runTime = 2;
+    float elapsedTime;
+
+    // 초기화
+    [Space(20)]
+    [Header("초기화")]
     public Transform pistonRod;
     public Transform switchForward;
     public Transform switchBackward;
@@ -19,17 +36,19 @@ public class Piston : MonoBehaviour
     public Image backwardButtonImg;
     public float minRange;
     public float maxRange;
-    public bool isBackward = true;
-    public float runTime = 2;
-    public float elapsedTime;
+    [Tooltip("실린더가 후진했을 때의 위치입니다.")]
     Vector3 minPos;
+    [Tooltip("실린더가 전진했을 때의 위치입니다.")]
     Vector3 maxPos;
+
+    // 옵션
+    [Space(20)]
+    [Header("옵션")]
+    [Tooltip("금속감지 센서 연결을 위한 변수입니다.")]
     public Sensor sensor;
+    [Tooltip("실린더가 움직일 때 재생되는 오디오 클립 입니다.")]
     public AudioClip clip;
-    public int[] plcInputValues; // 편솔의 경우 입력 1개, 양솔의 경우 입력 2개
-    public string rearSwitchDeviceName;
-    public string frontSwitchDeviceName;
-    public bool isCylinderMoving = false;
+
 
     // Start is called before the first frame update
     void Start()
@@ -37,8 +56,8 @@ public class Piston : MonoBehaviour
         DeviceInfo info = new DeviceInfo("신태욱", "123456", 55555, 5555, "2024.05.30", "2026.06.30");
         JsonSerialization.Instance.devices.Add(info);
 
-        SetCylinderBtnActive(!isBackward, true);
-        SetCylinderSwitchActive(!isBackward, true);
+        SetCylinderSwitchActive(true);
+        SetCylinderBtnActive(true);
 
         minPos = new Vector3(pistonRod.transform.localPosition.x, minRange, pistonRod.transform.localPosition.z);
         maxPos = new Vector3(pistonRod.transform.localPosition.x, maxRange, pistonRod.transform.localPosition.z);
@@ -128,8 +147,8 @@ public class Piston : MonoBehaviour
         isCylinderMoving = true;
 
         SetButtonActive(false);
-        SetCylinderBtnActive(isBackward, true);
-        SetCylinderSwitchActive(isBackward, false);
+        SetCylinderBtnActive(false);
+        SetCylinderSwitchActive(false);
 
         SetSwitchDevicesByCylinderMoving(isCylinderMoving, isBackward); // 스위치 값 변경
 
@@ -143,15 +162,11 @@ public class Piston : MonoBehaviour
             {
                 print(name + " 전진중...");
 
-                forwardButtonImg.color = Color.green;
-
                 MovePistonRod(minPos, maxPos, elapsedTime, runTime);
             }
             else
             {
                 print(name + " 후진중...");
-
-                backwardButtonImg.color = Color.green;
 
                 MovePistonRod(maxPos, minPos, elapsedTime, runTime);
             }
@@ -165,11 +180,12 @@ public class Piston : MonoBehaviour
 
         SetSwitchDevicesByCylinderMoving(isCylinderMoving, isBackward);
 
-        SetCylinderSwitchActive(isBackward, true);
+        SetCylinderSwitchActive(true);
+        SetCylinderBtnActive(true);
         SetButtonActive(true);
     }
 
-    private void SetCylinderSwitchActive(bool direction, bool isActive)
+    private void SetCylinderSwitchActive(bool isActive)
     {
         if(isActive)
         {
@@ -189,22 +205,34 @@ public class Piston : MonoBehaviour
         }
     }
 
-    void SetCylinderBtnActive(bool direction, bool isActive)
+    void SetCylinderBtnActive(bool isActive)
     {
-        if (direction == isBackward)
+        if (isActive)
         {
-            forwardButtonImg.color = Color.green;
-            backwardButtonImg.color = Color.white;
+            if (isBackward)
+            {
+                forwardButtonImg.color = Color.white;
+                backwardButtonImg.color = Color.green;
+            }
+            else
+            {
+                forwardButtonImg.color = Color.green;
+                backwardButtonImg.color = Color.white;
+            }
         }
         else
         {
             forwardButtonImg.color = Color.white;
-            backwardButtonImg.color = Color.green;
+            forwardButtonImg.color = Color.white;
         }
+
     }
 
     void SetButtonActive(bool isActive)
     {
+        if (MPSMxComponent.instance.connection == MPSMxComponent.Connection.Connected)
+            return;
+
         forwardButtonImg.GetComponent<Button>().interactable = isActive;
         backwardButtonImg.GetComponent<Button>().interactable = isActive;
     }

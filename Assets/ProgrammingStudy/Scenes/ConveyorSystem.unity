@@ -1997,6 +1997,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   option: 2
+  rearSwitchDeviceName: Y12
+  frontSwitchDeviceName: Y13
+  plcInputValues: 
+  isBackward: 1
+  isCylinderMoving: 0
+  runTime: 1
   pistonRod: {fileID: 1836641175}
   switchForward: {fileID: 1972798153}
   switchBackward: {fileID: 1240921999}
@@ -2004,15 +2010,8 @@ MonoBehaviour:
   backwardButtonImg: {fileID: 432654511}
   minRange: -0.1
   maxRange: -1.7
-  isBackward: 1
-  runTime: 1
-  elapsedTime: 0
   sensor: {fileID: 0}
   clip: {fileID: 8300000, guid: bf2e3220b4fdd214190bde0c52fde14a, type: 3}
-  plcInputValues: 0000000000000000
-  rearSwitchDeviceName: Y12
-  frontSwitchDeviceName: Y13
-  isCylinderMoving: 0
 --- !u!1 &327764898
 GameObject:
   m_ObjectHideFlags: 0
@@ -3773,6 +3772,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   option: 2
+  rearSwitchDeviceName: Y32
+  frontSwitchDeviceName: Y33
+  plcInputValues: 0000000000000000
+  isBackward: 1
+  isCylinderMoving: 0
+  runTime: 1
   pistonRod: {fileID: 1247081149}
   switchForward: {fileID: 1822359447}
   switchBackward: {fileID: 757215172}
@@ -3780,15 +3785,8 @@ MonoBehaviour:
   backwardButtonImg: {fileID: 197229556}
   minRange: -0.1
   maxRange: -1.75
-  isBackward: 1
-  runTime: 1
-  elapsedTime: 0
   sensor: {fileID: 0}
   clip: {fileID: 8300000, guid: bf2e3220b4fdd214190bde0c52fde14a, type: 3}
-  plcInputValues: 0000000000000000
-  rearSwitchDeviceName: Y32
-  frontSwitchDeviceName: Y33
-  isCylinderMoving: 0
 --- !u!1 &581062265
 GameObject:
   m_ObjectHideFlags: 0
@@ -6022,9 +6020,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   connection: 1
   offButtons:
-  - {fileID: 1470072864}
-  - {fileID: 78142156}
-  - {fileID: 226299161}
   - {fileID: 611507442}
   - {fileID: 210300748}
   - {fileID: 432654510}
@@ -8831,6 +8826,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   option: 2
+  rearSwitchDeviceName: Y42
+  frontSwitchDeviceName: Y43
+  plcInputValues: 0000000000000000
+  isBackward: 1
+  isCylinderMoving: 0
+  runTime: 1
   pistonRod: {fileID: 1235535743}
   switchForward: {fileID: 1975947024}
   switchBackward: {fileID: 676682917}
@@ -8838,15 +8839,8 @@ MonoBehaviour:
   backwardButtonImg: {fileID: 1731473296}
   minRange: -0.1
   maxRange: -1.4
-  isBackward: 1
-  runTime: 1
-  elapsedTime: 0
   sensor: {fileID: 0}
   clip: {fileID: 8300000, guid: bf2e3220b4fdd214190bde0c52fde14a, type: 3}
-  plcInputValues: 0000000000000000
-  rearSwitchDeviceName: Y42
-  frontSwitchDeviceName: Y43
-  isCylinderMoving: 0
 --- !u!1 &1388396213
 GameObject:
   m_ObjectHideFlags: 0
@@ -9372,6 +9366,18 @@ MonoBehaviour:
           m_ObjectArgument: {fileID: 8300000, guid: 1114dff25d17a644aa063334ec0c615c,
             type: 3}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.AudioClip, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 950388289}
+        m_TargetAssemblyTypeName: MPS.MPSMxComponent, Assembly-CSharp
+        m_MethodName: OnStartPLCButtonClkEvent
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -12555,6 +12561,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   option: 1
+  rearSwitchDeviceName: Y22
+  frontSwitchDeviceName: Y23
+  plcInputValues: 00000000
+  isBackward: 1
+  isCylinderMoving: 0
+  runTime: 1
   pistonRod: {fileID: 83232018}
   switchForward: {fileID: 1826448288}
   switchBackward: {fileID: 1852809949}
@@ -12562,15 +12574,8 @@ MonoBehaviour:
   backwardButtonImg: {fileID: 1249693773}
   minRange: -0.45
   maxRange: -1.5
-  isBackward: 1
-  runTime: 1
-  elapsedTime: 0
   sensor: {fileID: 0}
   clip: {fileID: 8300000, guid: 8d7f649c715db7149bd5e04ba42d8acc, type: 3}
-  plcInputValues: 00000000
-  rearSwitchDeviceName: Y22
-  frontSwitchDeviceName: Y23
-  isCylinderMoving: 0
 --- !u!1 &1892640214
 GameObject:
   m_ObjectHideFlags: 0
